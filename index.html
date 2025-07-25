@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>QR Code Scanner</title>
+  <script src="https://unpkg.com/html5-qrcode"></script>
+  <style>
+    body {
+      background: #0f0f23;
+      color: white;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding-top: 30px;
+    }
+
+    #reader {
+      width: 300px;
+      margin: auto;
+    }
+
+    #result {
+      margin-top: 20px;
+      font-size: 18px;
+      word-wrap: break-word;
+    }
+
+    a {
+      color: #00ffcc;
+      text-decoration: underline;
+    }
+
+    button {
+      margin-top: 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #e94560;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>QR Code Scanner</h1>
+  <div id="reader"></div>
+  <div id="result">Scan a QR code to see result here.</div>
+  <button onclick="stopScanner()">Stop Camera</button>
+
+  <script>
+    const resultDiv = document.getElementById('result');
+    const html5QrCode = new Html5Qrcode("reader");
+
+    function onScanSuccess(decodedText, decodedResult) {
+      html5QrCode.stop(); // stop camera after successful scan
+      if (decodedText.startsWith("http")) {
+        resultDiv.innerHTML = `Scanned URL: <a href="${decodedText}" target="_blank">${decodedText}</a>`;
+      } else {
+        resultDiv.innerHTML = `Scanned Data: ${decodedText}`;
+      }
+    }
+
+    function startScanner() {
+      html5QrCode.start(
+        { facingMode: "environment" }, // use back camera if available
+        {
+          fps: 10,
+          qrbox: 250
+        },
+        onScanSuccess
+      );
+    }
+
+    function stopScanner() {
+      html5QrCode.stop().then(() => {
+        resultDiv.innerText = "Scanner stopped.";
+      }).catch(err => {
+        console.error("Stop failed", err);
+      });
+    }
+
+    // Start scanner on page load
+    startScanner();
+  </script>
+</body>
+</html>
